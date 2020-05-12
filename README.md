@@ -1,2 +1,2 @@
-# blacklist_lbry
-script to find spam comments and put in a xlsx file
+# Spam List
+Script to find spam comments on lbry
