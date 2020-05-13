@@ -78,6 +78,7 @@ def get_spam_comments(claim_ids):
 
 
 # Start
+print('Searching...%')
 claim_ids = get_claim_ids()
 data = get_spam_comments(claim_ids)
 
