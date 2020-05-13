@@ -5,9 +5,9 @@ Script to find spam comments on lbry
 
 `git clone https://github.com/lpessin/spamlist_lbry.git`
 
-`pip install requests
+`pip install requests`
 
- pip install xlsxwriter`
+ `pip install xlsxwriter`
  
  `run script.py`
 
