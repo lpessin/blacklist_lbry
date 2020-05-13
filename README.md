@@ -9,7 +9,7 @@ Script to find spam comments on lbry
 
  `pip install xlsxwriter`
  
- `cd spam_list_lbry`
+ `cd spamlist_lbry`
  
  `python script.py`
 
