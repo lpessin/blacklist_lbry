@@ -4,7 +4,6 @@ from datetime import datetime, timedelta
 import xlsxwriter
 import csv
 
-
 # Search for comments on claims from a list of channels. Better chances to catch spam on top channels.
 CHANNEL_IDS = []
 with open('ids', 'r') as r:
@@ -27,7 +26,7 @@ XLSX_FILE = True
 
 def get_claim_ids():
     claim_ids = []
-    limit = datetime.now() - timedelta(days=DAYS_BACK)  # days back to search
+    limit = datetime.now() - timedelta(days=DAYS_BACK)
     timestamp_limit = str(int(datetime.timestamp(limit)))
     for page in range(1, 30):
         call = requests.post("http://localhost:5279", json={"method": "claim_search", "params": {
@@ -61,7 +60,6 @@ def get_claim_ids():
 def get_spam_comments(claim_ids):
     keywords = KEYWORDS
     spam_list = []
-    spam_count = 0
     for claim_id in claim_ids:
         call = requests.post("http://localhost:5279", json={"method": "comment_list", "params": {
             "claim_id": claim_id,
@@ -70,10 +68,9 @@ def get_spam_comments(claim_ids):
             content = comment.get('comment').lower()
             for keyword in keywords:
                 if keyword in content:
-                    spam_count += 1
                     spam_list.append([comment.get('timestamp'), comment.get('comment_id'), comment.get('claim_id'),
                                       comment.get('channel_name'), content])
-    print(f'{spam_count} spam comments found!')
+    print(f'{len(spam_list)} spam comments found!')
     return spam_list
 
 
@@ -85,26 +82,33 @@ data = get_spam_comments(claim_ids)
 # Print result
 print(data)
 
-# timestamp of created data
+# timestamp - days back
 timestamp = f'{str(int(datetime.timestamp(datetime.now())))}-{str(DAYS_BACK)}'
 
 # Create xlsx file
 if XLSX_FILE:
-    workbook = xlsxwriter.Workbook(f'{timestamp}.xlsx')
-    worksheet = workbook.add_worksheet()
-    row = 0
+    print('Building xlsx...%')
+    workbook = xlsxwriter.Workbook(f'lists/{timestamp}.xlsx')
+    worksheet = workbook.add_worksheet('data')
+    worksheet.write(0, 0, f'Created on {datetime.now()}')
+    worksheet.write(1, 0, f'Days back {DAYS_BACK} - Claims: {len(claim_ids)} - Comments found: {len(data)}')
+    worksheet.write(2, 0, 'https://github.com/lpessin/spamlist_lbry')
+    worksheet.add_table(f'A4:E{len(data) + 4}', {'columns': [{'header': 'Timestamp'},
+                                                         {'header': 'Comment_ID'},
+                                                         {'header': 'Claim_ID'},
+                                                         {'header': 'Channel'},
+                                                         {'header': 'Comment'}]})
+    row = 4
     col = 0
     for item in data:
-        worksheet.write(row, col, item[0])
+        worksheet.write(row, col, f'{datetime.fromtimestamp(item[0])}')
         worksheet.write(row, col + 1, item[1])
         worksheet.write(row, col + 2, item[2])
-        worksheet.write(row, col + 3, item[3])
+        worksheet.write_url(row, col + 3, f"https://lbry.tv/{item[3]}", string=item[3])
         worksheet.write(row, col + 4, item[4])
-
         row += 1
     workbook.close()
     print(f'{timestamp}.xlsx created')
-
 
 '''
 encode issues

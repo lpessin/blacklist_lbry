@@ -1,6 +1,8 @@
 import requests
 import csv
 
+# Get channels names and them their IDs. Channels names from top 200 (lbrynomics). Will be automated soon.
+
 names = []
 with open('channels', 'r') as r:
     reader = csv.reader(r)
