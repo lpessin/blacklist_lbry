@@ -11,6 +11,8 @@ Script to find spam comments on lbry
  
  `run script.py`
 
+Requires SDK or LBRY instance running
+
 # Settings
 Edit script.py 
 
